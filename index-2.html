@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Creator OS">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="manifest" href="manifest.json">
+<title>Creator OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0A0A0A;--bg2:#111111;--bg3:#1A1A1A;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#F0EDE8;--text2:#8A8680;--text3:#5A5752;--accent:#C9A96E;--accent2:#E8D5B0;--green:#4ADE80;--orange:#FB923C;--red:#F87171;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif}
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity 0.5s}
+#splash.hide{opacity:0;pointer-events:none}
+.splash-logo{font-size:11px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:24px}
+.splash-title{font-size:36px;font-weight:800;color:var(--text);letter-spacing:-0.02em;margin-bottom:8px}
+.splash-sub{font-size:13px;color:var(--text3)}
+.splash-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);animation:pulse 1.2s infinite;margin-top:40px}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:1}}
+#auth-screen{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;padding:env(safe-area-inset-top,24px) 24px 24px;overflow-y:auto}
+#auth-screen.show{display:flex}
+.auth-header{margin-top:60px;margin-bottom:40px}
+.auth-eyebrow{font-size:11px;letter-spacing:0.16em;color:var(--text3);text-transform:uppercase;margin-bottom:12px}
+.auth-title{font-size:28px;font-weight:700;color:var(--text);line-height:1.2;letter-spacing:-0.01em}
+.auth-title span{color:var(--accent)}
+.auth-tabs{display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:32px}
+.auth-tab{flex:1;padding:10px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:600;font-family:'Syne',sans-serif;border-radius:8px;cursor:pointer;transition:all 0.2s}
+.auth-tab.active{background:var(--bg2);color:var(--text)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;margin-bottom:8px}
+.field input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;font-size:14px;font-family:'DM Mono',monospace;color:var(--text);outline:none;transition:border-color 0.2s}
+.field input:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--text3)}
+.auth-btn{width:100%;background:var(--accent);color:#0A0A0A;border:none;border-radius:10px;padding:16px;font-size:15px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;margin-top:8px;transition:opacity 0.2s}
+.auth-btn:active{opacity:0.8}
+.auth-err{font-size:12px;color:var(--red);margin-top:12px;text-align:center;min-height:20px}
+.auth-note{font-size:12px;color:var(--text3);line-height:1.6;margin-top:24px;text-align:center}
+#app{position:fixed;inset:0;display:none;flex-direction:column}
+#app.show{display:flex}
+.app-header{padding:env(safe-area-inset-top,16px) 20px 0;background:var(--bg)}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding-top:16px;margin-bottom:12px}
+.app-logo{font-size:10px;letter-spacing:0.16em;color:var(--text3);text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:12px}
+.live-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-family:'DM Mono',monospace}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.logout-btn{font-size:11px;color:var(--text3);background:transparent;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:'Syne',sans-serif;padding:5px 10px;transition:all 0.2s}
+.logout-btn:hover{color:var(--red);border-color:var(--red)}
+.user-badge{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.user-email{font-size:11px;font-family:'DM Mono',monospace;color:var(--text2)}
+.user-plan{font-size:10px;background:rgba(201,169,110,0.1);color:var(--accent);padding:3px 8px;border-radius:4px;font-weight:600;letter-spacing:0.06em}
+.stats-row{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.stats-row::-webkit-scrollbar{display:none}
+.stat-pill{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;white-space:nowrap;flex-shrink:0}
+.stat-pill-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px}
+.stat-pill-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)}
+.niche-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;margin-bottom:4px;scrollbar-width:none}
+.niche-scroll::-webkit-scrollbar{display:none}
+.niche-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--text2);white-space:nowrap;cursor:pointer;transition:all 0.15s;flex-shrink:0}
+.niche-chip.active{background:var(--accent);border-color:var(--accent);color:#0A0A0A}
+.tab-row{display:flex;border-bottom:1px solid var(--border)}
+.tab-btn{flex:1;padding:10px 4px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);border:none;background:transparent;font-family:'Syne',sans-serif;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.content-area{flex:1;overflow-y:auto;padding:12px 20px env(safe-area-inset-bottom,20px);scrollbar-width:none}
+.content-area::-webkit-scrollbar{display:none}
+.panel{display:none;flex-direction:column;gap:8px}
+.panel.active{display:flex}
+.hook-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.hook-text{font-size:14px;color:var(--text);flex:1;line-height:1.5;font-weight:500}
+.score{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;padding:4px 8px;border-radius:6px;flex-shrink:0}
+.s-high{background:rgba(74,222,128,0.12);color:var(--green)}
+.s-med{background:rgba(251,146,60,0.12);color:var(--orange)}
+.s-low{background:rgba(255,255,255,0.06);color:var(--text3)}
+.trend-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.trend-hook{font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:10px}
+.trend-footer{display:flex;align-items:center;justify-content:space-between}
+.trend-meta{display:flex;gap:12px}
+.meta-item{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)}
+.meta-item span{color:var(--text2)}
+.view-btn{font-size:11px;font-weight:600;color:var(--accent);text-decoration:none;letter-spacing:0.04em}
+.platform-tag{font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+.pt-instagram{background:rgba(232,213,176,0.1);color:var(--accent)}
+.pt-youtube{background:rgba(248,113,113,0.1);color:var(--red)}
+.idea-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.idea-niche{font-size:10px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;margin-bottom:6px}
+.idea-text{font-size:13px;color:var(--text2);line-height:1.7;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;line-height:1.8}
+.empty-icon{font-size:32px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="splash-logo">AI Content Intelligence</div>
+  <div class="splash-title">Creator OS</div>
+  <div class="splash-sub">Your personal content studio</div>
+  <div class="splash-dot"></div>
+</div>
+
+<div id="auth-screen">
+  <div class="auth-header">
+    <div class="auth-eyebrow">Welcome</div>
+    <div class="auth-title">Your AI content<br>studio <span>awaits.</span></div>
+  </div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchAuth('login',this)">Sign In</button>
+    <button class="auth-tab" onclick="switchAuth('signup',this)">Sign Up</button>
+  </div>
+  <div id="login-form">
+    <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@email.com" autocapitalize="none"></div>
+    <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"></div>
+    <button class="auth-btn" onclick="login()">Sign In →</button>
+  </div>
+  <div id="signup-form" style="display:none">
+    <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="you@email.com" autocapitalize="none"></div>
+    <div class="field"><label>Password</label><input type="password" id="signup-password" placeholder="Min 6 characters"></div>
+    <button class="auth-btn" onclick="signup()">Create Account →</button>
+  </div>
+  <div class="auth-err" id="auth-err"></div>
+  <div class="auth-note">Your data is private and secure.<br>Only you can see your content.</div>
+</div>
+
+<div id="app">
+  <div class="app-header">
+    <div class="header-top">
+      <div class="app-logo">Creator OS</div>
+      <div class="header-right">
+        <div class="live-badge"><div class="live-dot"></div>Live</div>
+        <button class="logout-btn" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+    <div class="user-badge">
+      <div class="user-email" id="user-email">—</div>
+      <div class="user-plan">Pro</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-pill"><div class="stat-pill-label">Trends</div><div class="stat-pill-val" id="c-trends">—</div></div>
+      <div class="stat-pill"><div class="stat-pill-label">Hooks</div><div class="stat-pill-val" id="c-hooks">—</div></div>
+      <div class="stat-pill"><div class="stat-pill-label">Ideas</div><div class="stat-pill-val" id="c-ideas">—</div></div>
+    </div>
+    <div class="niche-scroll" id="niche-scroll"></div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('hooks',this)">Hooks</button>
+      <button class="tab-btn" onclick="switchTab('trends',this)">Trends</button>
+      <button class="tab-btn" onclick="switchTab('ideas',this)">Ideas</button>
+    </div>
+  </div>
+  <div class="content-area">
+    <div class="panel active" id="panel-hooks"></div>
+    <div class="panel" id="panel-trends"></div>
+    <div class="panel" id="panel-ideas"></div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://yqfmkrnfzglvgfobpkuu.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxZm1rcm5memdsdmdmb2Jwa3V1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MDYzNjQsImV4cCI6MjA5NDQ4MjM2NH0.sbb1h5-MasCmm2COfjRzVOvkbc8GLrBrL8cQta0WKTs';
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_KEY);
+let activeNiche = 'all';
+let allData = {trends:[],hooks:[],scripts:[]};
+const NICHES = [
+  {id:'all',label:'✦ All'},
+  {id:'cinematic filmmaking',label:'🎬 Cinematic'},
+  {id:'personal finance',label:'💰 Finance'},
+  {id:'fitness & health',label:'💪 Fitness'},
+  {id:'clothing & fashion',label:'👗 Fashion'},
+  {id:'tech & ai',label:'🤖 Tech & AI'},
+  {id:'food & recipes',label:'🍜 Food'},
+  {id:'travel',label:'✈️ Travel'},
+  {id:'motivation & mindset',label:'🔥 Motivation'},
+  {id:'business & entrepreneurship',label:'📈 Business'}
+];
+setTimeout(async()=>{
+  document.getElementById('splash').classList.add('hide');
+  const {data:{session}} = await sb.auth.getSession();
+  if(session) showApp(session.user);
+  else document.getElementById('auth-screen').classList.add('show');
+},1800);
+function switchAuth(type,el){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('login-form').style.display=type==='login'?'block':'none';
+  document.getElementById('signup-form').style.display=type==='signup'?'block':'none';
+  document.getElementById('auth-err').textContent='';
+}
+async function login(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  if(!email||!password){document.getElementById('auth-err').textContent='Please fill both fields.';return;}
+  document.getElementById('auth-err').textContent='Signing in...';
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error){document.getElementById('auth-err').textContent=error.message;return;}
+  showApp(data.user);
+}
+async function signup(){
+  const email=document.getElementById('signup-email').value.trim();
+  const password=document.getElementById('signup-password').value;
+  if(!email||!password){document.getElementById('auth-err').textContent='Please fill all fields.';return;}
+  document.getElementById('auth-err').textContent='Creating account...';
+  const {data,error}=await sb.auth.signUp({email,password});
+  if(error){document.getElementById('auth-err').textContent=error.message;return;}
+  showApp(data.user);
+}
+async function logout(){
+  await sb.auth.signOut();
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('auth-screen').classList.add('show');
+}
+async function showApp(user){
+  document.getElementById('auth-screen').classList.remove('show');
+  document.getElementById('app').classList.add('show');
+  document.getElementById('user-email').textContent=user.email;
+  buildNiches();
+  await loadData();
+}
+async function loadData(){
+  const [t,h,s]=await Promise.all([
+    sb.from('trends').select('*').order('created_at',{ascending:false}).limit(200),
+    sb.from('hooks').select('*').order('score',{ascending:false}).limit(200),
+    sb.from('scripts').select('*').order('created_at',{ascending:false}).limit(200)
+  ]);
+  allData={trends:t.data||[],hooks:h.data||[],scripts:s.data||[]};
+  document.getElementById('c-trends').textContent=allData.trends.length;
+  document.getElementById('c-hooks').textContent=allData.hooks.length;
+  document.getElementById('c-ideas').textContent=allData.scripts.length;
+  renderAll();
+}
+function buildNiches(){
+  document.getElementById('niche-scroll').innerHTML=NICHES.map(n=>`<div class="niche-chip ${n.id==='all'?'active':''}" onclick="selectNiche('${n.id}',this)">${n.label}</div>`).join('');
+}
+function selectNiche(id,el){
+  activeNiche=id;
+  document.querySelectorAll('.niche-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+function filterByNiche(arr){
+  if(activeNiche==='all') return arr;
+  return arr.filter(i=>i.topic&&i.topic.toLowerCase()===activeNiche.toLowerCase());
+}
+function scoreClass(s){return s>=8?'s-high':s>=5?'s-med':'s-low';}
+function renderAll(){renderHooks();renderTrends();renderIdeas();}
+function renderHooks(){
+  const el=document.getElementById('panel-hooks');
+  const hooks=filterByNiche(allData.hooks);
+  if(!hooks.length){el.innerHTML='<div class="empty"><div class="empty-icon">🎣</div>No hooks yet.<br>Run your n8n workflow first.</div>';return;}
+  el.innerHTML=hooks.map(h=>`<div class="hook-card"><div class="hook-text">${h.hook||'—'}</div><div class="score ${scoreClass(h.score||0)}">${h.score||0}/10</div></div>`).join('');
+}
+function renderTrends(){
+  const el=document.getElementById('panel-trends');
+  const trends=filterByNiche(allData.trends);
+  if(!trends.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div>No trends yet.<br>Run your n8n workflow first.</div>';return;}
+  el.innerHTML=trends.map(t=>`<div class="trend-card"><div class="trend-hook">${t.hook||t.title||'—'}</div><div class="trend-footer"><div class="trend-meta"><div class="meta-item">👁 <span>${(t.views||0).toLocaleString()}</span></div><div class="meta-item">❤️ <span>${(t.likes||0).toLocaleString()}</span></div></div><div style="display:flex;align-items:center;gap:8px"><span class="platform-tag pt-${t.platform||'instagram'}">${t.platform||'ig'}</span>${t.url?`<a class="view-btn" href="${t.url}" target="_blank">View →</a>`:''}</div></div></div>`).join('');
+}
+function renderIdeas(){
+  const el=document.getElementById('panel-ideas');
+  const scripts=filterByNiche(allData.scripts);
+  if(!scripts.length){el.innerHTML='<div class="empty"><div class="empty-icon">💡</div>No ideas yet.<br>Run your n8n workflow first.</div>';return;}
+  el.innerHTML=scripts.map(s=>`<div class="idea-card"><div class="idea-niche">${s.topic||'cinematic filmmaking'}</div><div class="idea-text">${s.script||s.hook||'—'}</div></div>`).join('');
+}
+function switchTab(name,el){
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
