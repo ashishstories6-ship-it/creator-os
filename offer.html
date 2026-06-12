@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator OS — AI Content System for Brands & Creators</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080A;
+  --bg2:#0F0F12;
+  --bg3:#161619;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --text:#F2EDE6;
+  --text2:#8C8680;
+  --text3:#4A4845;
+  --gold:#C9A96E;
+  --gold2:#E8D5B0;
+  --gold-glow:rgba(201,169,110,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+
+/* NOISE TEXTURE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(8,8,10,0.9),transparent);backdrop-filter:blur(10px)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold2);letter-spacing:0.02em}
+.nav-cta{background:var(--gold);color:#08080A;padding:10px 22px;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:0.04em;transition:all 0.2s}
+.nav-cta:hover{background:var(--gold2)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(201,169,110,0.08) 0%,transparent 70%);pointer-events:none}
+.hero-line{width:1px;height:80px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);margin:0 auto 40px}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:24px}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(48px,7vw,88px);font-weight:900;line-height:1.0;letter-spacing:-0.02em;color:var(--text);margin-bottom:16px}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:18px;font-weight:300;color:var(--text2);max-width:520px;margin:0 auto 48px;line-height:1.7}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--gold);color:#08080A;padding:16px 36px;border-radius:4px;font-size:14px;font-weight:500;text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;transition:all 0.2s}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--text2);padding:16px 36px;border-radius:4px;font-size:14px;font-weight:500;text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--border2);transition:all 0.2s}
+.btn-secondary:hover{color:var(--text);border-color:var(--gold)}
+.hero-scroll{margin-top:80px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text3);font-size:11px;letter-spacing:0.1em;text-transform:uppercase}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--text3),transparent)}
+
+/* SOCIAL PROOF */
+.proof{padding:60px 40px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:60px;flex-wrap:wrap}
+.proof-item{text-align:center}
+.proof-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--gold2);display:block}
+.proof-label{font-size:12px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px}
+
+/* SECTION */
+section{padding:100px 40px;max-width:1100px;margin:0 auto}
+.section-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:16px}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,52px);font-weight:700;line-height:1.15;letter-spacing:-0.01em;color:var(--text);margin-bottom:20px}
+.section-title em{font-style:italic;color:var(--gold)}
+.section-sub{font-size:16px;color:var(--text2);line-height:1.8;max-width:560px}
+
+/* PROBLEM */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px}
+.problem-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:28px;position:relative;overflow:hidden}
+.problem-card::before{content:'✗';position:absolute;top:20px;right:20px;font-size:18px;color:var(--text3)}
+.problem-card h4{font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px}
+.problem-card p{font-size:13px;color:var(--text3);line-height:1.7}
+
+/* HOW IT WORKS */
+.steps{display:flex;flex-direction:column;gap:0;margin-top:60px;position:relative}
+.steps::before{content:'';position:absolute;left:28px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--gold),transparent)}
+.step{display:flex;gap:32px;padding:32px 0;position:relative}
+.step-num{width:56px;height:56px;border-radius:50%;background:var(--bg3);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:13px;color:var(--gold);flex-shrink:0;position:relative;z-index:1}
+.step-content h4{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px}
+.step-content p{font-size:14px;color:var(--text2);line-height:1.8}
+.step-tag{display:inline-block;background:var(--gold-glow);border:1px solid rgba(201,169,110,0.2);border-radius:3px;padding:3px 10px;font-size:11px;font-family:'DM Mono',monospace;color:var(--gold);margin-top:10px}
+
+/* PACKAGES */
+.packages{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:60px}
+.package{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:36px 28px;position:relative;transition:border-color 0.2s}
+.package:hover{border-color:var(--border2)}
+.package.featured{border-color:var(--gold);background:linear-gradient(135deg,var(--bg2),rgba(201,169,110,0.04))}
+.package-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#08080A;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:4px 14px;border-radius:20px;white-space:nowrap}
+.package-name{font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;font-family:'DM Mono',monospace}
+.package-price{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;color:var(--text);margin-bottom:4px}
+.package-price span{font-size:16px;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:300}
+.package-desc{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6}
+.package-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.package-features li{font-size:13px;color:var(--text2);display:flex;align-items:flex-start;gap:10px}
+.package-features li::before{content:'→';color:var(--gold);flex-shrink:0;font-family:'DM Mono',monospace}
+.package-btn{display:block;text-align:center;padding:14px;border-radius:4px;font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;transition:all 0.2s}
+.package-btn-primary{background:var(--gold);color:#08080A}
+.package-btn-primary:hover{background:var(--gold2)}
+.package-btn-secondary{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.package-btn-secondary:hover{color:var(--text);border-color:var(--gold)}
+
+/* NICHES */
+.niche-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px}
+.niche-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;display:flex;align-items:center;gap:14px}
+.niche-emoji{font-size:24px}
+.niche-name{font-size:14px;font-weight:500;color:var(--text)}
+.niche-sub{font-size:12px;color:var(--text3);margin-top:2px}
+
+/* TESTIMONIAL */
+.testimonial-section{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:80px 40px;text-align:center}
+.testimonial-quote{font-family:'Playfair Display',serif;font-size:clamp(20px,3vw,32px);font-style:italic;color:var(--text);max-width:700px;margin:0 auto 32px;line-height:1.5}
+.testimonial-author{font-size:13px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;font-family:'DM Mono',monospace}
+
+/* PROCESS */
+.process-timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:60px;position:relative}
+.process-timeline::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:linear-gradient(to right,transparent,var(--border2),var(--border2),transparent)}
+.process-step{text-align:center;position:relative}
+.process-icon{width:56px;height:56px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px;position:relative;z-index:1}
+.process-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px}
+.process-sub{font-size:12px;color:var(--text3);line-height:1.6}
+.process-day{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:0.1em;margin-bottom:8px}
+
+/* CTA SECTION */
+.cta-section{text-align:center;padding:120px 40px;position:relative;overflow:hidden}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(201,169,110,0.06) 0%,transparent 70%);pointer-events:none}
+.cta-title{font-family:'Playfair Display',serif;font-size:clamp(36px,5vw,64px);font-weight:900;line-height:1.1;letter-spacing:-0.02em;margin-bottom:20px}
+.cta-title em{font-style:italic;color:var(--gold)}
+.cta-sub{font-size:16px;color:var(--text2);margin-bottom:48px;line-height:1.7}
+
+/* CONTACT FORM */
+.contact-form{max-width:520px;margin:0 auto;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:40px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:11px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;font-family:'DM Mono',monospace}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-group textarea{resize:vertical;min-height:100px}
+.form-group select option{background:var(--bg3)}
+.form-submit{width:100%;background:var(--gold);color:#08080A;border:none;padding:16px;border-radius:6px;font-size:14px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;margin-top:8px}
+.form-submit:hover{background:var(--gold2)}
+.form-success{display:none;text-align:center;padding:20px;color:var(--gold);font-size:15px}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.footer-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold2)}
+.footer-note{font-size:12px;color:var(--text3)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero-eyebrow{animation:fadeUp 0.6s ease 0.2s both}
+.hero-title{animation:fadeUp 0.6s ease 0.4s both}
+.hero-sub{animation:fadeUp 0.6s ease 0.6s both}
+.hero-btns{animation:fadeUp 0.6s ease 0.8s both}
+
+@media(max-width:768px){
+  nav{padding:16px 20px}
+  .hero{padding:100px 20px 60px}
+  .proof{gap:32px;padding:40px 20px}
+  section{padding:60px 20px}
+  .problem-grid{grid-template-columns:1fr}
+  .packages{grid-template-columns:1fr}
+  .niche-grid{grid-template-columns:1fr 1fr}
+  .process-timeline{grid-template-columns:1fr 1fr}
+  .process-timeline::before{display:none}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Creator OS</div>
+  <a href="#contact" class="nav-cta">Get Started →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-line"></div>
+  <div class="hero-eyebrow">AI Content Intelligence System</div>
+  <h1 class="hero-title">Your brand.<br><em>Always trending.</em></h1>
+  <p class="hero-sub">I build a fully automated AI system that studies viral content daily and generates hooks, scripts, and reel ideas — tailored to your niche. Every morning. Automatically.</p>
+  <div class="hero-btns">
+    <a href="#contact" class="btn-primary">Book a Setup Call</a>
+    <a href="#packages" class="btn-secondary">See Packages</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</div>
+
+<!-- PROOF -->
+<div class="proof">
+  <div class="proof-item">
+    <span class="proof-num">9</span>
+    <div class="proof-label">Niches supported</div>
+  </div>
+  <div class="proof-item">
+    <span class="proof-num">50+</span>
+    <div class="proof-label">Hooks generated daily</div>
+  </div>
+  <div class="proof-item">
+    <span class="proof-num">0₹</span>
+    <div class="proof-label">Running cost after setup</div>
+  </div>
+  <div class="proof-item">
+    <span class="proof-num">24h</span>
+    <div class="proof-label">Setup time</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section>
+  <div class="section-eyebrow">The problem</div>
+  <h2 class="section-title">Content creators waste<br><em>hours every day</em></h2>
+  <p class="section-sub">Finding trending ideas, writing hooks, scripting reels — it's all manual, slow, and inconsistent. Most creators guess what works.</p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <h4>Scrolling for hours</h4>
+      <p>Manually browsing Instagram to find what's trending — no system, no data, just vibes.</p>
+    </div>
+    <div class="problem-card">
+      <h4>Generic AI captions</h4>
+      <p>Using ChatGPT for captions that sound exactly like everyone else. No differentiation.</p>
+    </div>
+    <div class="problem-card">
+      <h4>No hook strategy</h4>
+      <p>Posting without knowing why some hooks work and others don't. Pure guesswork.</p>
+    </div>
+    <div class="problem-card">
+      <h4>Inconsistent output</h4>
+      <p>Some weeks posting daily, some weeks nothing. No system = no growth.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="section-eyebrow">The solution</div>
+  <h2 class="section-title">Your personal<br><em>AI content team</em></h2>
+  <p class="section-sub">I build you a fully automated pipeline that runs every morning and delivers ready-to-shoot ideas directly to your dashboard.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <h4>Scrapes viral content daily</h4>
+        <p>Automatically pulls the top trending Instagram reels in your niche every morning — analyzing hooks, captions, views, and engagement patterns.</p>
+        <span class="step-tag">Apify · Instagram API</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <h4>AI analyzes why they went viral</h4>
+        <p>LLaMA 3 AI studies each reel — identifying hook psychology, emotional triggers, pacing style, and audience type.</p>
+        <span class="step-tag">Groq · LLaMA 3</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <h4>Generates scored hooks & reel ideas</h4>
+        <p>Creates 10 unique hooks scored 1-10 for viral potential, plus 3 ready-to-shoot reel ideas — all tailored to your brand voice.</p>
+        <span class="step-tag">AI Scoring System</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <h4>Delivered to your dashboard</h4>
+        <p>Everything appears in your personal content dashboard — accessible on any device, updated every day automatically.</p>
+        <span class="step-tag">Custom PWA Dashboard</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NICHES -->
+<section>
+  <div class="section-eyebrow">Who this is for</div>
+  <h2 class="section-title">Built for <em>every niche</em></h2>
+  <p class="section-sub">Whether you're a creator, brand, or agency — the system adapts to your content category.</p>
+  <div class="niche-grid">
+    <div class="niche-item"><span class="niche-emoji">🎬</span><div><div class="niche-name">Cinematic Filmmaking</div><div class="niche-sub">Spec ads, solo creators</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">💰</span><div><div class="niche-name">Personal Finance</div><div class="niche-sub">Wealth, investing, money</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">💪</span><div><div class="niche-name">Fitness & Health</div><div class="niche-sub">Workouts, nutrition, wellness</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">👗</span><div><div class="niche-name">Fashion & Clothing</div><div class="niche-sub">Streetwear, brands, style</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">🤖</span><div><div class="niche-name">Tech & AI</div><div class="niche-sub">Tools, automation, AI</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">🍜</span><div><div class="niche-name">Food & Recipes</div><div class="niche-sub">Restaurants, food brands</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">✈️</span><div><div class="niche-name">Travel</div><div class="niche-sub">Destinations, hospitality</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">🔥</span><div><div class="niche-name">Motivation & Mindset</div><div class="niche-sub">Coaches, speakers</div></div></div>
+    <div class="niche-item"><span class="niche-emoji">📈</span><div><div class="niche-name">Business</div><div class="niche-sub">Entrepreneurs, startups</div></div></div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section>
+  <div class="section-eyebrow">What to expect</div>
+  <h2 class="section-title">From zero to running<br><em>in 24 hours</em></h2>
+  <div class="process-timeline">
+    <div class="process-step">
+      <div class="process-icon">📞</div>
+      <div class="process-day">Day 1 · Morning</div>
+      <div class="process-title">Discovery call</div>
+      <div class="process-sub">We discuss your niche, goals, and content style</div>
+    </div>
+    <div class="process-step">
+      <div class="process-icon">⚙️</div>
+      <div class="process-day">Day 1 · Afternoon</div>
+      <div class="process-title">System build</div>
+      <div class="process-sub">I set up your database, scraper, and AI pipeline</div>
+    </div>
+    <div class="process-step">
+      <div class="process-icon">🎨</div>
+      <div class="process-day">Day 1 · Evening</div>
+      <div class="process-title">Dashboard ready</div>
+      <div class="process-sub">Your custom dashboard goes live with your branding</div>
+    </div>
+    <div class="process-step">
+      <div class="process-icon">🚀</div>
+      <div class="process-day">Day 2 · Morning</div>
+      <div class="process-title">First ideas delivered</div>
+      <div class="process-sub">Wake up to your first batch of AI-generated reel ideas</div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section id="packages">
+  <div class="section-eyebrow">Investment</div>
+  <h2 class="section-title">Simple, <em>transparent</em> pricing</h2>
+  <p class="section-sub">One-time setup fee. You own the system forever. Zero monthly costs after setup.</p>
+  <div class="packages">
+    <div class="package">
+      <div class="package-name">Starter</div>
+      <div class="package-price">₹2,999<span> one-time</span></div>
+      <div class="package-desc">Perfect for individual creators starting out.</div>
+      <ul class="package-features">
+        <li>1 niche setup</li>
+        <li>Instagram scraper</li>
+        <li>AI hook generator</li>
+        <li>Personal dashboard</li>
+        <li>7 days support</li>
+      </ul>
+      <a href="#contact" class="package-btn package-btn-secondary">Get Started</a>
+    </div>
+    <div class="package featured">
+      <div class="package-badge">Most Popular</div>
+      <div class="package-name">Creator Pro</div>
+      <div class="package-price">₹5,999<span> one-time</span></div>
+      <div class="package-desc">For serious creators who want a full content system.</div>
+      <ul class="package-features">
+        <li>Up to 3 niches</li>
+        <li>Instagram + YouTube scraper</li>
+        <li>AI hook + script generator</li>
+        <li>Custom branded dashboard</li>
+        <li>Content scoring system</li>
+        <li>30 days support</li>
+      </ul>
+      <a href="#contact" class="package-btn package-btn-primary">Book Now</a>
+    </div>
+    <div class="package">
+      <div class="package-name">Agency</div>
+      <div class="package-price">₹12,999<span> one-time</span></div>
+      <div class="package-desc">For agencies managing multiple brand clients.</div>
+      <ul class="package-features">
+        <li>All 9 niches</li>
+        <li>Multi-client setup</li>
+        <li>White-label dashboard</li>
+        <li>Custom AI prompts per brand</li>
+        <li>Priority support 60 days</li>
+        <li>Monthly check-in call</li>
+      </ul>
+      <a href="#contact" class="package-btn package-btn-secondary">Contact Me</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-glow"></div>
+  <h2 class="cta-title">Ready to stop<br>guessing and start<br><em>creating with data?</em></h2>
+  <p class="cta-sub">Book a free 15-minute call. I'll show you exactly how the system works and what it can do for your content.</p>
+</div>
+
+<!-- CONTACT -->
+<section id="contact" style="padding-top:0">
+  <div class="contact-form">
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="section-eyebrow" style="justify-content:center;display:flex">Get in touch</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--text);margin-top:8px">Book your setup</div>
+    </div>
+    <div class="form-group">
+      <label>Your name</label>
+      <input type="text" id="f-name" placeholder="Rahul Sharma">
+    </div>
+    <div class="form-group">
+      <label>Instagram / YouTube handle</label>
+      <input type="text" id="f-handle" placeholder="@yourhandle">
+    </div>
+    <div class="form-group">
+      <label>Your niche</label>
+      <select id="f-niche">
+        <option value="">Select your niche</option>
+        <option>Cinematic Filmmaking</option>
+        <option>Personal Finance</option>
+        <option>Fitness & Health</option>
+        <option>Fashion & Clothing</option>
+        <option>Tech & AI</option>
+        <option>Food & Recipes</option>
+        <option>Travel</option>
+        <option>Motivation & Mindset</option>
+        <option>Business & Entrepreneurship</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Package interested in</label>
+      <select id="f-package">
+        <option value="">Select a package</option>
+        <option>Starter — ₹2,999</option>
+        <option>Creator Pro — ₹5,999</option>
+        <option>Agency — ₹12,999</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Message (optional)</label>
+      <textarea id="f-msg" placeholder="Tell me about your content goals..."></textarea>
+    </div>
+    <button class="form-submit" onclick="submitForm()">Send Message →</button>
+    <div class="form-success" id="form-success">
+      ✓ Message sent! I'll reach out within 24 hours.
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Creator OS</div>
+  <div class="footer-note">Built by Ashish · AI Content Systems for Creators & Brands</div>
+</footer>
+
+<script>
+function submitForm(){
+  const name = document.getElementById('f-name').value;
+  const handle = document.getElementById('f-handle').value;
+  const niche = document.getElementById('f-niche').value;
+  const pkg = document.getElementById('f-package').value;
+  const msg = document.getElementById('f-msg').value;
+
+  if(!name || !handle || !niche || !pkg){
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  const whatsappMsg = `Hi Ashish! 👋
+
+I'm interested in Creator OS setup.
+
+*Name:* ${name}
+*Handle:* ${handle}
+*Niche:* ${niche}
+*Package:* ${pkg}
+*Message:* ${msg || 'No message'}`;
+
+  const encoded = encodeURIComponent(whatsappMsg);
+  const number = '916205788439'; // ← paste your number here
+
+  window.open(`https://wa.me/${number}?text=${encoded}`, '_blank');
+
+  document.querySelector('.form-submit').style.display = 'none';
+  document.getElementById('form-success').style.display = 'block';
+}
+
+// Scroll animations
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.style.opacity='1';
+      e.target.style.transform='translateY(0)';
+    }
+  });
+},{threshold:0.1});
+
+document.querySelectorAll('.step,.package,.niche-item,.process-step,.problem-card').forEach(el=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(20px)';
+  el.style.transition='opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
